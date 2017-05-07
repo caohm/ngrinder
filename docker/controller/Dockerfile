@@ -23,7 +23,7 @@ ADD binary/*.war ${BASE_DIR}
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
 
 # change permission
-RUN chmod a+x /script/*.sh
+RUN chmod a+x /scripts/*.sh
 
 # Execution
 CMD ["/scripts/run.sh"]

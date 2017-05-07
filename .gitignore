@@ -7,7 +7,7 @@
 .project
 .checkstyle
 .clover
-.idea
+.idea/
 target/
 ~$*
 /Servers

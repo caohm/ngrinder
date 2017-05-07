@@ -18,7 +18,7 @@ ADD scripts /scripts
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
 
 # change permission
-RUN chmod a+x /script/*.sh
+RUN chmod a+x /scripts/*.sh
 
 # Excution
 ENTRYPOINT ["/scripts/run.sh"]
