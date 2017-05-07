@@ -14,5 +14,11 @@ VOLUME $NGRINDER_AGENT_BASE
 # Copy initial execution script
 ADD scripts /scripts
 
+# timezone
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
+
+# change permission
+RUN chmod a+x /script/*.sh
+
 # Excution
 ENTRYPOINT ["/scripts/run.sh"]

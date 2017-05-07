@@ -3,7 +3,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.ngrinder</groupId>
+	<parent>
+		<groupId>org.ngrinder</groupId>
+		<artifactId>ngrinder</artifactId>
+		<version>3.4.1-SNAPSHOT</version>
+	</parent>
 	<artifactId>ngrinder-sh</artifactId>
 	<name>ngrinder-sh</name>
 	<version>3.4.1-SNAPSHOT</version>
@@ -11,6 +15,11 @@
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.17</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
