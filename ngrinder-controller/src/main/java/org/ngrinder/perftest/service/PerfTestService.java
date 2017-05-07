@@ -9,7 +9,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package org.ngrinder.perftest.service;
 
@@ -37,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
 import org.ngrinder.common.constant.ControllerConstants;
 import org.ngrinder.common.constants.GrinderConstants;
+import org.ngrinder.common.util.CompressionUtils;
 import org.ngrinder.infra.config.Config;
 import org.ngrinder.model.*;
 import org.ngrinder.monitor.controller.model.SystemDataModel;
@@ -492,7 +493,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#getPerfTestFilePath(org .ngrinder.perftest. model.PerfTest)
 	 */
 	@Override
@@ -502,7 +503,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#getPerfTestFilePath(org .ngrinder.perftest. model.PerfTest)
 	 */
 	@Override
@@ -653,6 +654,18 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 		ProcessingResultPrintStream processingResult = new ProcessingResultPrintStream(new ByteArrayOutputStream());
 		handler.prepareDist(perfTest.getId(), user, scriptEntry, perfTestDistDirectory, config.getControllerProperties(),
 				processingResult);
+
+		try {
+//			CompressionUtils.zip(perfTestDistDirectory, perfTestDistDirectory, "dist.zip", false);
+			CompressionUtils.zip(perfTestDistDirectory, false);
+			FileUtils.deleteQuietly(perfTestDistDirectory);
+			FileUtils.forceMkdir(perfTestDistDirectory);
+			FileUtils.copyFile(new File(perfTestDistDirectory.getParentFile().getAbsolutePath() + "/dist.zip"),
+				new File(perfTestDistDirectory.getAbsolutePath()+"/dist.zip"));
+			FileUtils.deleteQuietly(new File(perfTestDistDirectory.getParentFile().getAbsolutePath() + "/dist.zip"));
+		} catch (IOException e) {
+			throw processException("Error while file zip perfTestDistDirectory.");
+		}
 		LOGGER.info("File write is completed in {}", perfTestDistDirectory);
 		if (!processingResult.isSuccess()) {
 			File logDir = new File(getLogFileDirectory(perfTest), "distribution_log.txt");
@@ -901,7 +914,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#getAllPerfTest()
 	 */
 	@Override
@@ -989,7 +1002,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#stop(org.ngrinder .model.User, java.lang.Long)
 	 */
 	@Override
@@ -1025,7 +1038,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#getAllStopRequested()
 	 */
 	@Override
@@ -1042,7 +1055,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#addCommentOn(org.ngrinder .model.User, int, java.lang.String)
 	 */
 	@Override
@@ -1582,7 +1595,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#getAll(java.util.Date, java.util.Date)
 	 */
 	@Override
@@ -1592,7 +1605,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.ngrinder.service.IPerfTestService#getAll(java.util.Date, java.util.Date, java.lang.String)
 	 */
 	@Override
