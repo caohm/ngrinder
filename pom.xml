@@ -118,7 +118,23 @@
 					<artifactId>asm</artifactId>
 					<groupId>asm</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>net.sf.grinder</groupId>
+					<artifactId>grinder-core</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<!--使用自定义grinder-core-->
+		<dependency>
+			<artifactId>grinder-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>asm</artifactId>
+					<groupId>asm</groupId>
+				</exclusion>
+			</exclusions>
+			<groupId>net.sf.grinder</groupId>
+			<version>3.9.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.picocontainer</groupId>

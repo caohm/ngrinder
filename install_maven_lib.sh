@@ -8,8 +8,8 @@ if [[ ! -f ~/.m2/repository/grinder/grinder-patch/3.9.1/grinder-patch-3.9.1.jar 
 	./mvnw install:install-file -Dfile=lib/grinder-3.9.1-patch.jar -DgroupId=grinder -DartifactId=grinder-patch -Dversion=3.9.1-patch -Dpackaging=jar -DcreateChecksum=true
 fi
 
-if [[ ! -f ~/.m2/repository/net/sf/grinder/grinder-core/3.9.1/grinder-core-3.9.1.jar ]] ; then
-	./mvnw install:install-file -Dfile=lib/grinder-core-3.9.1.jar -DgroupId=net.sf.grinder -DartifactId=grinder-core -Dversion=3.9.1 -Dpackaging=jar -DcreateChecksum=true
+if [[ ! -f ~/.m2/repository/net/sf/grinder/grinder-core/3.9.1.1/grinder-core-3.9.1.1.jar ]] ; then
+	./mvnw install:install-file -Dfile=lib/grinder-core-3.9.1.1.jar -DgroupId=net.sf.grinder -DartifactId=grinder-core -Dversion=3.9.1.1 -Dpackaging=jar -DcreateChecksum=true
 fi
 
 if [[ ! -f ~/.m2/repository/org/ngrinder/universal-analytics-java/1.0/universal-analytics-java-1.0.jar ]] ; then

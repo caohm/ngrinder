@@ -656,12 +656,13 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 				processingResult);
 
 		try {
-//			CompressionUtils.zip(perfTestDistDirectory, perfTestDistDirectory, "dist.zip", false);
+			File perfTestDistDescDirectory = new File(perfTestDistDirectory.getAbsolutePath() + "2");
+			perfTestDistDescDirectory.mkdir();
+//			CompressionUtils.zip(perfTestDistDirectory, perfTestDistDescDirectory, "dist.zip", false);
 			CompressionUtils.zip(perfTestDistDirectory, false);
-			FileUtils.deleteQuietly(perfTestDistDirectory);
-			FileUtils.forceMkdir(perfTestDistDirectory);
-			FileUtils.copyFile(new File(perfTestDistDirectory.getParentFile().getAbsolutePath() + "/dist.zip"),
-				new File(perfTestDistDirectory.getAbsolutePath()+"/dist.zip"));
+//			FileUtils.deleteQuietly(perfTestDistDirectory);
+//			FileUtils.forceMkdir(perfTestDistDirectory);
+			FileUtils.copyFile(new File(perfTestDistDirectory.getParentFile().getAbsolutePath() + "/dist.zip"), new File(perfTestDistDirectory.getAbsolutePath()+"2/dist.zip"));
 			FileUtils.deleteQuietly(new File(perfTestDistDirectory.getParentFile().getAbsolutePath() + "/dist.zip"));
 		} catch (IOException e) {
 			throw processException("Error while file zip perfTestDistDirectory.");

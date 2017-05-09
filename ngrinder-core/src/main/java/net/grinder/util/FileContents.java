@@ -25,6 +25,7 @@ import net.grinder.common.Closer;
 import net.grinder.common.GrinderException;
 import net.grinder.common.UncheckedInterruptedException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -131,16 +132,15 @@ public final class FileContents implements Serializable {
 			Closer.close(outputStream);
 		}
 		try {
-			m_logger.info("unzip file");
 			if (getFilename().getName().equals("dist.zip")) {
 				m_logger.info("unzip dist.zip");
-				unZipFiles(new File(baseDirectory.getFile().getAbsolutePath() + "/dist.zip"), baseDirectory.getFile());
+				unZipFiles(localFile, baseDirectory.getFile(), m_logger);
 				m_logger.info("delete dist.zip");
-				FileUtils.deleteQuietly(new File(baseDirectory.getFile().getAbsolutePath() + "/dist.zip"));
+				FileUtils.forceDelete(localFile);
 			}
 		} catch (Exception e) {
 			m_logger.info("zip error " + e.getMessage(), e);
-			throw new FileContentsException("Failed to unzip dist.zip : " + e.getMessage(), e);
+//            throw new FileContentsException("Failed to unzip dist.zip : " + e.getMessage(), e);
 		} finally {
 		}
 	}
@@ -150,10 +150,11 @@ public final class FileContents implements Serializable {
 	 *
 	 * @param zipFile
 	 * @param descDir
+	 * @param m_logger
 	 * @author isea533
 	 */
 	@SuppressWarnings("rawtypes")
-	public static void unZipFiles(File zipFile, File descDir) throws IOException {
+	public static void unZipFiles(File zipFile, File descDir, Logger m_logger) throws IOException {
 		File pathFile = descDir;
 		if (!pathFile.exists()) {
 			pathFile.mkdirs();
@@ -173,18 +174,12 @@ public final class FileContents implements Serializable {
 			if (new File(outPath).isDirectory()) {
 				continue;
 			}
-			//输出文件路径信息
-			System.out.println(outPath);
-
 			OutputStream out = new FileOutputStream(outPath);
-			byte[] buf1 = new byte[1024];
-			int len;
-			while ((len = in.read(buf1)) > 0) {
-				out.write(buf1, 0, len);
-			}
-			in.close();
-			out.close();
+			IOUtils.copy(in, out);
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
 		}
+		IOUtils.closeQuietly(zip);
 	}
 
 	/**

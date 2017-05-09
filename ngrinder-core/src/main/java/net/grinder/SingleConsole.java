@@ -380,6 +380,12 @@ public class SingleConsole extends AbstractSingleConsole implements Listener, Sa
 	 * @param safe     safe mode
 	 */
 	public void distributeFiles(ListenerSupport<FileDistributionListener> listener, final boolean safe) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 		final FileDistribution fileDistribution = getConsoleComponent(FileDistribution.class);
 		final AgentCacheState agentCacheState = fileDistribution.getAgentCacheState();
 		final Condition cacheStateCondition = new Condition();
@@ -401,11 +407,23 @@ public class SingleConsole extends AbstractSingleConsole implements Listener, Sa
 				}
 			});
 		}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 		final FileDistributionHandler distributionHandler = fileDistribution.getHandler();
 		// When cancel is called.. stop processing.
 		int fileCount = 0;
 		while (!cancel) {
 			try {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
 				final FileDistributionHandler.Result result = distributionHandler.sendNextFile();
 				fileCount++;
 				if (result == null) {
@@ -541,7 +559,7 @@ public class SingleConsole extends AbstractSingleConsole implements Listener, Sa
 
 	/*
      * (non-Javadoc)
-	 * 
+	 *
 	 * @see net.grinder.ISingleConsole2#getStatisticsIndexMap()
 	 */
 	public StatisticsIndexMap getStatisticsIndexMap() {
