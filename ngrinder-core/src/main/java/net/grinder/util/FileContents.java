@@ -134,13 +134,13 @@ public final class FileContents implements Serializable {
 		try {
 			if (getFilename().getName().equals("dist.zip")) {
 				m_logger.info("unzip dist.zip");
-				unZipFiles(localFile, baseDirectory.getFile(), m_logger);
+				unZipFiles(localFile, baseDirectory.getFile());
 				m_logger.info("delete dist.zip");
 				FileUtils.forceDelete(localFile);
 			}
 		} catch (Exception e) {
 			m_logger.info("zip error " + e.getMessage(), e);
-//            throw new FileContentsException("Failed to unzip dist.zip : " + e.getMessage(), e);
+            throw new FileContentsException("Failed to unzip dist.zip : " + e.getMessage(), e);
 		} finally {
 		}
 	}
@@ -150,11 +150,9 @@ public final class FileContents implements Serializable {
 	 *
 	 * @param zipFile
 	 * @param descDir
-	 * @param m_logger
 	 * @author isea533
 	 */
-	@SuppressWarnings("rawtypes")
-	public static void unZipFiles(File zipFile, File descDir, Logger m_logger) throws IOException {
+	public static void unZipFiles(File zipFile, File descDir) throws IOException {
 		File pathFile = descDir;
 		if (!pathFile.exists()) {
 			pathFile.mkdirs();

@@ -39,7 +39,13 @@ import org.ngrinder.common.constant.ControllerConstants;
 import org.ngrinder.common.constants.GrinderConstants;
 import org.ngrinder.common.util.CompressionUtils;
 import org.ngrinder.infra.config.Config;
-import org.ngrinder.model.*;
+import org.ngrinder.model.PerfTest;
+import org.ngrinder.model.Permission;
+import org.ngrinder.model.RampUp;
+import org.ngrinder.model.Role;
+import org.ngrinder.model.Status;
+import org.ngrinder.model.Tag;
+import org.ngrinder.model.User;
 import org.ngrinder.monitor.controller.model.SystemDataModel;
 import org.ngrinder.perftest.model.PerfTestStatistics;
 import org.ngrinder.perftest.model.ProcessAndThread;
@@ -64,19 +70,49 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedSet;
 
 import static org.ngrinder.common.constants.MonitorConstants.MONITOR_FILE_PREFIX;
 import static org.ngrinder.common.util.AccessUtils.getSafe;
-import static org.ngrinder.common.util.CollectionUtils.*;
+import static org.ngrinder.common.util.CollectionUtils.newArrayList;
+import static org.ngrinder.common.util.CollectionUtils.newHashMap;
+import static org.ngrinder.common.util.CollectionUtils.newHashSet;
 import static org.ngrinder.common.util.ExceptionUtils.processException;
 import static org.ngrinder.common.util.NoOp.noOp;
 import static org.ngrinder.common.util.Preconditions.checkNotEmpty;
 import static org.ngrinder.common.util.Preconditions.checkNotNull;
 import static org.ngrinder.model.Status.getProcessingOrTestingTestStatus;
-import static org.ngrinder.perftest.repository.PerfTestSpecification.*;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.createdBy;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.hasTag;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.idEmptyPredicate;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.idEqual;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.idRegionEqual;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.idSetEqual;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.likeTestNameOrDescription;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.scheduledTimeNotEmptyPredicate;
+import static org.ngrinder.perftest.repository.PerfTestSpecification.statusSetEqual;
 
 /**
  * {@link PerfTest} Service Class.
@@ -270,7 +306,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 
 	private void attachTags(User user, PerfTest perfTest, String tagString) {
 		SortedSet<Tag> tags = tagService.addTags(user,
-				StringUtils.split(StringUtils.trimToEmpty(tagString), ","));
+			StringUtils.split(StringUtils.trimToEmpty(tagString), ","));
 		perfTest.setTags(tags);
 		perfTest.setTagString(buildTagString(tags));
 	}
@@ -388,7 +424,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 	public PerfTest markPerfTestConsoleStart(PerfTest perfTest, int consolePort) {
 		perfTest.setPort(consolePort);
 		return markProgressAndStatus(perfTest, Status.START_CONSOLE_FINISHED, "Console is started on port "
-				+ consolePort);
+			+ consolePort);
 	}
 
 
@@ -567,7 +603,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 			// Get all files in the script path
 			String scriptName = perfTest.getScriptName();
 			FileEntry userDefinedGrinderProperties = fileEntryService.getOne(user,
-					FilenameUtils.concat(FilenameUtils.getPath(scriptName), DEFAULT_GRINDER_PROPERTIES), -1L);
+				FilenameUtils.concat(FilenameUtils.getPath(scriptName), DEFAULT_GRINDER_PROPERTIES), -1L);
 			if (!config.isSecurityEnabled() && userDefinedGrinderProperties != null) {
 				// Make the property overridden by user property.
 				GrinderProperties userProperties = new GrinderProperties();
@@ -591,18 +627,18 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 				}
 			}
 			grinderProperties.setProperty(GRINDER_PROP_ETC_HOSTS,
-					StringUtils.defaultIfBlank(perfTest.getTargetHosts(), ""));
+				StringUtils.defaultIfBlank(perfTest.getTargetHosts(), ""));
 			grinderProperties.setBoolean(GRINDER_PROP_USE_CONSOLE, true);
 			if (BooleanUtils.isTrue(perfTest.getUseRampUp())) {
 				grinderProperties.setBoolean(GRINDER_PROP_THREAD_RAMPUP, perfTest.getRampUpType() == RampUp.THREAD);
 				grinderProperties.setInt(GRINDER_PROP_PROCESS_INCREMENT, getSafe(perfTest.getRampUpStep()));
 				grinderProperties.setInt(GRINDER_PROP_PROCESS_INCREMENT_INTERVAL,
-						getSafe(perfTest.getRampUpIncrementInterval()));
+					getSafe(perfTest.getRampUpIncrementInterval()));
 				if (perfTest.getRampUpType() == RampUp.PROCESS) {
 					grinderProperties.setInt(GRINDER_PROP_INITIAL_SLEEP_TIME, getSafe(perfTest.getRampUpInitSleepTime()));
 				} else {
 					grinderProperties.setInt(GRINDER_PROP_INITIAL_THREAD_SLEEP_TIME,
-							getSafe(perfTest.getRampUpInitSleepTime()));
+						getSafe(perfTest.getRampUpInitSleepTime()));
 				}
 				grinderProperties.setInt(GRINDER_PROP_INITIAL_PROCESS, getSafe(perfTest.getRampUpInitCount()));
 			} else {
@@ -656,14 +692,13 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 				processingResult);
 
 		try {
-			File perfTestDistDescDirectory = new File(perfTestDistDirectory.getAbsolutePath() + "2");
+			File perfTestDistDescDirectory = new File(perfTestDistDirectory.getAbsolutePath() + "/distribute");
 			perfTestDistDescDirectory.mkdir();
-//			CompressionUtils.zip(perfTestDistDirectory, perfTestDistDescDirectory, "dist.zip", false);
 			CompressionUtils.zip(perfTestDistDirectory, false);
-//			FileUtils.deleteQuietly(perfTestDistDirectory);
-//			FileUtils.forceMkdir(perfTestDistDirectory);
-			FileUtils.copyFile(new File(perfTestDistDirectory.getParentFile().getAbsolutePath() + "/dist.zip"), new File(perfTestDistDirectory.getAbsolutePath()+"2/dist.zip"));
-			FileUtils.deleteQuietly(new File(perfTestDistDirectory.getParentFile().getAbsolutePath() + "/dist.zip"));
+			File srcFile = new File(perfTestDistDirectory.getParent(), "dist.zip");
+			File destFile = new File(perfTestDistDescDirectory, "dist.zip");
+			FileUtils.copyFile(srcFile, destFile);
+			FileUtils.deleteQuietly(srcFile);
 		} catch (IOException e) {
 			throw processException("Error while file zip perfTestDistDirectory.");
 		}
@@ -883,7 +918,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 			}
 			json = gson.toJson(pickAgentStateMap);
 			LOGGER.debug("Agent status string get {} outof {} agents, new size is {}.", new Object[]{pickSize,
-					agentStatusMap.size(), json.length()});
+				agentStatusMap.size(), json.length()});
 		}
 		return json;
 	}
@@ -1200,7 +1235,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 	 */
 	public int getMonitorGraphInterval(long testId, String targetIP, int imageWidth) {
 		File monitorDataFile = new File(config.getHome().getPerfTestReportDirectory(String.valueOf(testId)),
-				MONITOR_FILE_PREFIX + targetIP + ".data");
+			MONITOR_FILE_PREFIX + targetIP + ".data");
 
 		int pointCount = Math.max(imageWidth, MAX_POINT_COUNT);
 		FileInputStream in = null;
@@ -1238,7 +1273,7 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 	public Map<String, String> getMonitorGraph(long testId, String targetIP, int dataInterval) {
 		Map<String, String> returnMap = Maps.newHashMap();
 		File monitorDataFile = new File(config.getHome().getPerfTestReportDirectory(String.valueOf(testId)),
-				MONITOR_FILE_PREFIX + targetIP + ".data");
+			MONITOR_FILE_PREFIX + targetIP + ".data");
 		BufferedReader br = null;
 		try {
 
@@ -1485,15 +1520,15 @@ public class PerfTestService extends AbstractPerfTestService implements Controll
 	/**
 	 * Get list that contains test report data as a string.
 	 *
-	 * @param testId   test id
-	 * @param key      report key
+	 * @param testId    test id
+	 * @param key       report key
 	 * @param onlyTotal true if only total show be passed
-	 * @param interval interval to collect data
+	 * @param interval  interval to collect data
 	 * @return list containing label and tps value list
 	 */
 	public Pair<ArrayList<String>, ArrayList<String>> getReportData(long testId, String key, boolean onlyTotal, int interval) {
 		Pair<ArrayList<String>, ArrayList<String>> resultPair = Pair.of(new ArrayList<String>(),
-				new ArrayList<String>());
+			new ArrayList<String>());
 		List<File> reportDataFiles = onlyTotal ? Lists.newArrayList(getReportDataFile(testId, key)) : getReportDataFiles(testId, key);
 		for (File file : reportDataFiles) {
 			String buildReportName = buildReportName(key, file);

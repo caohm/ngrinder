@@ -288,9 +288,8 @@ public class PerfTestRunnable implements ControllerConstants {
 		});
 
 		// the files have prepared before
-		File file = new File(perfTestService.getDistributionPath(perfTest).getAbsolutePath() + "2");
-		singleConsole.distributeFiles(file, listener, isSafeDistPerfTest(perfTest));
-//		FileUtils.deleteQuietly(file);
+		File dist = new File(perfTestService.getDistributionPath(perfTest),"distribute");
+		singleConsole.distributeFiles(dist, listener, isSafeDistPerfTest(perfTest));
 		perfTestService.markStatusAndProgress(perfTest, DISTRIBUTE_FILES_FINISHED,
 				"All necessary files are distributed.");
 	}

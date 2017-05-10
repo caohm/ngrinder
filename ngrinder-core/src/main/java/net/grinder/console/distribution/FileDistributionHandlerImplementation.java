@@ -42,8 +42,7 @@ final class FileDistributionHandlerImplementation implements FileDistributionHan
         try {
             if (this.m_fileIndex < this.m_files.length) {
                 if (this.m_fileIndex == 0) {
-//                    Address addressAgentsWithInvalidCaches = this.m_agents.getAddressOfOutOfDateAgents(0L);
-                    Address addressAgentsWithInvalidCaches = this.m_agents.getAddressOfAllAgents();
+                    Address addressAgentsWithInvalidCaches = this.m_agents.getAddressOfOutOfDateAgents(0L);
                     this.m_distributionControl.clearFileCaches(addressAgentsWithInvalidCaches);
                 }
 
@@ -51,8 +50,7 @@ final class FileDistributionHandlerImplementation implements FileDistributionHan
                 try {
                     final int index = this.m_fileIndex;
                     final File file = this.m_files[index];
-//                    Address addressAgentsWithoutFile = this.m_agents.getAddressOfOutOfDateAgents((new File(this.m_directory, file.getPath())).lastModified());
-                    Address addressAgentsWithoutFile = this.m_agents.getAddressOfAllAgents();
+                    Address addressAgentsWithoutFile = this.m_agents.getAddressOfOutOfDateAgents((new File(this.m_directory, file.getPath())).lastModified());
                     this.m_distributionControl.sendFile(addressAgentsWithoutFile, new FileContents(this.m_directory, file));
                     var4 = new Result() {
                         public int getProgressInCents() {
